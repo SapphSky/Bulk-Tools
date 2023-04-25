@@ -4,24 +4,19 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bulk Tools</title>
+    <title>Phoenix Template Editor</title>
 </head>
 
 <body>
-    <nav>
-        <div class="left">
-            <span>Bulk Tools</span>
-            <span>File</span>
-            <span>Edit</span>
-            <span>View</span>
-            <span>Help</span>
-        </div>
-        
-        <div class="right">
-            <span>Test</span>
-        </div>
-    </nav>
+    <div id="container_groups">
 
+    </div>
+
+    <div>
+        <button id="btn_newGroup" title="Add a new group">New Group</button>
+        <button hidden>Export to CSV</button>
+    </div>
+    
     <datalist id="attributes">
         <option value="" hidden>Select an attribute...</option>
         <option value="manufacturer">Manufacturer</option>
@@ -54,20 +49,29 @@
             <summary>
                 <span>Group</span>
             </summary>
-
-            <div class="container_attributes">
-                
-            </div>
-
+            
             <div>
-                <span>IDs</span>
-                <ul>
-                    <li>
-                        <input type="text" size="8"><button>x</button>
-                    </li>
-                </ul>
+                <div>
+                    <span>Attributes</span>
+                    <div id="container_attributes">
+                        
+                    </div>
+                </div>
+                
+                <div>
+                    <span>IDs</span>
+                    <div id="container_ids">
+                        
+                    </div>
+                </div>
             </div>
         </details>
+    </template>
+
+    <template id="tmp_id">
+        <div>
+            <input type="text" size="8" placeholder="Enter ID"><button hidden>x</button>
+        </div>
     </template>
 
     <template id="tmp_attribute">
@@ -99,56 +103,78 @@
                 <option value="enrolled_status">Enrolled Status</option>
             </select>
             <span>→</span>
-            <input type="text" autocapitalize="off" class="attribute_value">
+            <input type="text" autocapitalize="off">
         </div>
     </template>
-
-    <div id="groups_container">
-
-    </div>
-
-    <div>
-        <button id="btn_newGroup" title="Add a new group">New Group</button>
-        <button>Export to CSV</button>
-    </div>
-    
 </body>
 
 <script>
-    const btn_newGroup = document.querySelector("#btn_newGroup");
-    btn_newGroup.addEventListener("click", () => {
-        const tmp_group = document.querySelector("#tmp_group");
-        const clone = tmp_group.content.firstElementChild.cloneNode(true);
+    class Group {
+        constructor() {
+            this.ids = [];
+            this.attributes = {};
+        }
 
-        const tmp_attribute = document.querySelector("#tmp_attribute");
-        const attribute = tmp_attribute.content.firstElementChild.cloneNode(true);
+        setAttrib(key, value) {
+            this.attributes[key] = value;
+            console.log("Group attribute changed:", this, `(${key} set to ${value})`)
+        }
 
-        clone.appendChild(attribute);
-
-        // Assign the text field a function to create a new attribute item when filled out ONCE.
-        const attrib_inputField = attribute.querySelector(".attribute_value");
-        attrib_inputField.addEventListener("change", (event) => {
-            if (event.target.value != "") {
-                // Create a new attribute 
-            }
-        });
-
-        document.querySelector(".groups_container").appendChild(clone);
-    });
-
-    let groups = [];
-    
-    const group = {
-        attributes: {},
-        ids: [],
-        addAttribute: function(attrib, value) {
-            this.attributes[attrib] = value;
-        },
-        content: null,
+        addId(id) {
+            this.ids.push(id);
+        }
     }
 
-    function drawGroupContent(attributes, ids) {
+    const container_group = document.querySelector("#container_groups");
+    const template_id = document.querySelector("#tmp_id");
 
+    let groups = [];
+
+    const btn_newGroup = document.querySelector("#btn_newGroup");
+    btn_newGroup.addEventListener("click", () => {
+        const newGroup = new Group();
+        groups.push(newGroup);
+        drawGroup(newGroup);
+    });
+
+    function addAttributeToGroup(group, key, value) {
+        group.attributes[key] = value;
+        console.log("New Attribute added to group:", group);
+    }
+
+    function addIdToGroup(group, id) {
+        group.ids.push(id);
+        console.log("New ID added to group:", group);
+    }
+
+    function drawGroup(group) {
+        console.log("Drawing:", group);
+        const template_group = document.querySelector("#tmp_group");
+        const instance = template_group.content.cloneNode(true);
+
+        const add_attrib = instance.querySelector("#input_add_attribute");
+        // add_attrib.addEventListener("click", drawAttribute(instance.querySelector("#container_attributes"), group));
+
+        drawAttribute(instance.querySelector("#container_attributes"), group);
+        drawIds(instance.querySelector("#container_ids"), group);
+
+        container_group.appendChild(instance);
+    }
+
+    function drawAttribute(root, group) {
+        const template_attribute = document.querySelector("#tmp_attribute");
+        const instance = template_attribute.content.cloneNode(true);
+
+        root.appendChild(instance);
+        console.log("Done drawing attribute");        
+    }
+
+    function drawIds(root, group) {
+        const template_id = document.querySelector("#tmp_id");
+        const instance = template_id.content.cloneNode(true);
+
+        root.appendChild(instance);
+        console.log("Done drawing ids");
     }
 </script>
 
