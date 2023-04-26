@@ -73,7 +73,6 @@ function createNewGroup() {
     
     // Create display elements
     const element = template_group.content.firstElementChild.cloneNode(true);
-    element.querySelector("summary span").innerText = `Group ${group.name}`;
     createNewAttribute(element.querySelector("div#container_attributes"), group.name);
     
     const input_id = element.querySelector("input#id_entry");
@@ -97,6 +96,7 @@ function createNewAttribute(parentNode, groupID) {
         groups[groupID].setAttrib("security_level", event.target.value);
         groups[groupID].drawIds();
     });
+
     /*
     input.addEventListener("change", (event) => {
         if (select.value != "") {
@@ -109,6 +109,8 @@ function createNewAttribute(parentNode, groupID) {
         }
     });
     */
+   
+    groups[groupID].setAttrib("security_level", select.value);
     return attribute;
 }
 

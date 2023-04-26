@@ -30,28 +30,21 @@
     </div>
 
     <template id="group">
-        <details open>
-            <summary>
-                <span>Group</span>
-            </summary>
-            
+        <div class="group">
             <div>
-                <div>
-                    <span>Attributes</span>
-                    <div id="container_attributes">
-                        
-                    </div>
-                </div>
-                
-                <div>
-                    <span>IDs</span>
-                    <input type="text" id="id_entry" size="12" placeholder="Enter new ID...">
-                    <div id="container_ids">
-                        
-                    </div>
+                <div id="container_attributes">
+                    
                 </div>
             </div>
-        </details>
+            
+            <div>
+                <span>IDs</span>
+                <input type="text" id="id_entry" size="12" placeholder="Enter new ID...">
+                <div id="container_ids">
+                    
+                </div>
+            </div>
+        </div>
     </template>
 
     <template id="deprecated_attribute">
@@ -141,18 +134,8 @@
         grid-template-rows: 1fr 1fr;
     }
 
-    details {
-        display: inline-block;
-        padding: 6px 12px;
-        border-radius: 4px;
-        background-color: rgb(226, 226, 226);
-    }
-
-    summary {
-        user-select: none;
-    }
-
     li {
+        display: inline;
         list-style: none;
         padding: 4px 8px;
         border-radius: 4px 0px 0px 4px;
@@ -162,6 +145,22 @@
 
     li:hover {
         background: linear-gradient(to right, rgba(186, 186, 186, 1), rgba(255,0,0,0));
+    }
+
+    div.group {
+        margin: 4px auto;
+        padding: 8px;
+
+        background-color: rgba(226, 226, 226, 0.9);
+        border-radius: 4px;
+        transition: ease 0.2s;
+        user-select: none;
+    }
+
+    div.group:hover {
+        outline-color: black;
+        outline-style: solid;
+        outline-width: 2px;
     }
 </style>
 <script src="script.js"></script>
