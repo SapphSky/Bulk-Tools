@@ -8,43 +8,20 @@
 </head>
 
 <body>
+    <div id="sidebar">
+
+    </div>
+
     <div id="container_groups">
 
     </div>
 
     <div>
-        <button id="btn_newGroup" title="Add a new group">New Group</button>
-        <button hidden>Export to CSV</button>
+        <button id="new_group" title="New Group" hidden>New</button>
+        <button id="save" title="Save group as CSV template">Save</button>
     </div>
-    
-    <datalist id="attributes">
-        <option value="" hidden>Select an attribute...</option>
-        <option value="manufacturer">Manufacturer</option>
-        <option value="warehouse_location">Location</option>
-        <option value="model">Model</option>
-        <option value="ram">RAM</option>
-        <option value="cpu">CPU</option>
-        <option value="hard_drive">Hard Drive</option>
-        <option value="sku">SKU</option>
-        <option value="description">Description</option>
-        <option value="comments">Comments</option>
-        <option value="condition">Condition</option>
-        <option value="color">Color</option>
-        <option value="battery_count">Battery Cycle Count</option>
-        <option value="security_level">Security Level</option>
-        <option value="trackpad_is_working">Trackpad Working</option>
-        <option value="keyboard_is_working">Keyboard Working</option>
-        <option value="lcd_display_is_working">LCD Working</option>
-        <option value="battery_is_working">Battery Working</option>
-        <option value="device_type">Device Type</option>
-        <option value="year">Year</option>
-        <option value="gpu">GPU</option>
-        <option value="hard_drive_size_in_gb">HD Size in GB</option>
-        <option value="model_order">Model Order</option>
-        <option value="enrolled_status">Enrolled Status</option>
-    </datalist>
 
-    <template id="tmp_group">
+    <template id="group">
         <details open>
             <summary>
                 <span>Group</span>
@@ -60,6 +37,7 @@
                 
                 <div>
                     <span>IDs</span>
+                    <input type="text" id="id_entry" size="12" placeholder="Enter new ID...">
                     <div id="container_ids">
                         
                     </div>
@@ -68,13 +46,7 @@
         </details>
     </template>
 
-    <template id="tmp_id">
-        <div>
-            <input type="text" size="8" placeholder="Enter ID"><button hidden>x</button>
-        </div>
-    </template>
-
-    <template id="tmp_attribute">
+    <template id="attribute">
         <div>
             <select id="drop_attrib">
                 <option value="" hidden>Select an attribute...</option>
@@ -108,76 +80,6 @@
     </template>
 </body>
 
-<script>
-    class Group {
-        constructor() {
-            this.ids = [];
-            this.attributes = {};
-        }
-
-        setAttrib(key, value) {
-            this.attributes[key] = value;
-            console.log("Group attribute changed:", this, `(${key} set to ${value})`)
-        }
-
-        addId(id) {
-            this.ids.push(id);
-        }
-    }
-
-    const container_group = document.querySelector("#container_groups");
-    const template_id = document.querySelector("#tmp_id");
-
-    let groups = [];
-
-    const btn_newGroup = document.querySelector("#btn_newGroup");
-    btn_newGroup.addEventListener("click", () => {
-        const newGroup = new Group();
-        groups.push(newGroup);
-        drawGroup(newGroup);
-    });
-
-    function addAttributeToGroup(group, key, value) {
-        group.attributes[key] = value;
-        console.log("New Attribute added to group:", group);
-    }
-
-    function addIdToGroup(group, id) {
-        group.ids.push(id);
-        console.log("New ID added to group:", group);
-    }
-
-    function drawGroup(group) {
-        console.log("Drawing:", group);
-        const template_group = document.querySelector("#tmp_group");
-        const instance = template_group.content.cloneNode(true);
-
-        const add_attrib = instance.querySelector("#input_add_attribute");
-        // add_attrib.addEventListener("click", drawAttribute(instance.querySelector("#container_attributes"), group));
-
-        drawAttribute(instance.querySelector("#container_attributes"), group);
-        drawIds(instance.querySelector("#container_ids"), group);
-
-        container_group.appendChild(instance);
-    }
-
-    function drawAttribute(root, group) {
-        const template_attribute = document.querySelector("#tmp_attribute");
-        const instance = template_attribute.content.cloneNode(true);
-
-        root.appendChild(instance);
-        console.log("Done drawing attribute");        
-    }
-
-    function drawIds(root, group) {
-        const template_id = document.querySelector("#tmp_id");
-        const instance = template_id.content.cloneNode(true);
-
-        root.appendChild(instance);
-        console.log("Done drawing ids");
-    }
-</script>
-
 <style>
     :root {
         --bg-color: rgb(26, 26, 26);
@@ -197,6 +99,11 @@
     [data-theme="joel"] {
         --bg-color: rgb(26, 59, 86);
         --text-color: hsl(35, 65%, 40%);
+    }
+
+    [data-theme="revivn"] {
+        --bg-color: rgb(255, 255, 255);
+        --text-color: rgb(0, 0, 0);
     }
 
     body {
@@ -265,4 +172,5 @@
         user-select: none;
     }
 </style>
+<script src="script.js"></script>
 </html>
