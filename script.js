@@ -7,46 +7,12 @@ class TemplateGroup {
         this.displayElement = null;
     }
 
-    save() {
-        const headers = Object.keys(this.attributes);
-        const rows = this.ids;
-
-        console.log("id,", headers);
-        this.ids.forEach((element) => {
-            console.log(element, Object.values(this.attributes));
-        });
-
-        /*
-        const download = function(data) {
-            const blob = new Blob([data], {type: "text/csv"});
-            const url = window.URL.createObjectURL(blob);
-            const a = document.createElement("a");
-            a.setAttribute("href", url);
-            a.setAttribute("download", "download.csv");
-            a.click();
-        }
-
-        const csvmaker = function(data) {
-            csvRows = [];
-            const headers = Object.keys(data);
-            csvRows.push(headers.join(","));
-            const values = Object.values(data.join(","));
-            csvRows.push(values);
-            return csvRows.join("\n");
-        }
-
-        const get = async function() {
-            
-        }
-        */
-    }
-
     addId(id) {
         if (this.ids.find(element => element == id)) {
             return false
         }
         else {
-            this.ids.push(id);
+            this.ids.push(id.trim());
             console.log(`Added ID: ${id} to group ${this.name}`);
             this.drawIds();
             return true
@@ -68,7 +34,7 @@ class TemplateGroup {
             id_container.innerHTML = "";
 
             this.ids.forEach(element => {
-                id_container.innerHTML += `<li>${element}</li>`;
+                id_container.innerHTML += `<li>${element} - ${Object.values(this.attributes)}</li>`;
             });
         }
         else {
@@ -78,7 +44,7 @@ class TemplateGroup {
     }
 
     drawAttribs() {
-
+        
     }
 }
 
@@ -93,6 +59,13 @@ const container_groups = document.querySelector("div#container_groups");
 const template_group = document.querySelector("template#group");
 const template_attribute = document.querySelector("template#attribute");
 
+//! Buttons
+const button_new_group = document.querySelector("button#new_group");
+button_new_group.addEventListener("click", () => createNewGroup());
+
+const btn_save = document.querySelector("button#save");
+btn_save.addEventListener("click", () => saveBtnEventHandler());
+
 //! Functions
 function createNewGroup() {
     const group = new TemplateGroup(groups.length);
@@ -100,13 +73,13 @@ function createNewGroup() {
     
     // Create display elements
     const element = template_group.content.firstElementChild.cloneNode(true);
-    
+    element.querySelector("summary span").innerText = `Group ${group.name}`;
     createNewAttribute(element.querySelector("div#container_attributes"), group.name);
     
     const input_id = element.querySelector("input#id_entry");
     input_id.setAttribute("data-groupID", group.name);
     input_id.addEventListener("change", (event) => idEntryHandler(event));
-    
+   
     group.displayElement = element;
     container_groups.appendChild(element);
 }
@@ -117,15 +90,17 @@ function createNewAttribute(parentNode, groupID) {
     parentNode.appendChild(attribute);
     
     const select = attribute.querySelector("select");
-    const input = attribute.querySelector("input");
+    // const input = attribute.querySelector("input");
     
     select.addEventListener("change", (event) => {
-        input.value = "";
+        // input.value = "";
+        groups[groupID].setAttrib("security_level", event.target.value);
+        groups[groupID].drawIds();
     });
-    
+    /*
     input.addEventListener("change", (event) => {
         if (select.value != "") {
-            groups[groupID].setAttrib(select.value, event.target.value);
+            // groups[groupID].setAttrib(select.value, event.target.value);
             
             if (attribute.getAttribute("data-last")) {
                 attribute.removeAttribute("data-last");
@@ -133,13 +108,20 @@ function createNewAttribute(parentNode, groupID) {
             }
         }
     });
-    
+    */
     return attribute;
 }
 
 //! Event Handlers
 function saveBtnEventHandler() {
-    groups[0].save();
+    const headers = Object.keys(groups[0].attributes);
+    console.log("id,", headers);
+    groups.forEach((group, index) => {
+        const rows = group.ids;
+        group.ids.forEach((element) => {
+            console.log(element, Object.values(group.attributes));
+        });
+    })
 }
 
 function idEntryHandler(event) {
@@ -154,9 +136,3 @@ function idEntryHandler(event) {
     }
 }
 
-//! Buttons
-const button_new_group = document.querySelector("button#new_group");
-button_new_group.addEventListener("click", createNewGroup());
-
-const btn_save = document.querySelector("button#save");
-btn_save.addEventListener("click", saveBtnEventHandler());
