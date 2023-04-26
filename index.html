@@ -94,7 +94,7 @@
             <input type="text" autocapitalize="off" hidden>
             <select>
                 <option value="Not locked">Not locked</option>
-                <option value="Elevated security">Elevated Security</option>
+                <option value="Elevated security">Elevated security</option>
                 <option value="EFI locked">EFI locked</option>
                 <option value="BIOS locked">BIOS locked</option>
                 <option value="Icloud locked">iCloud locked</option>
@@ -154,9 +154,14 @@
 
     li {
         list-style: none;
-        margin: 4px auto;
+        padding: 4px 8px;
+        border-radius: 4px 0px 0px 4px;
+        background: linear-gradient(to right, rgba(0, 0, 0, 0), rgba(0, 0, 0, 0));
+        transition: ease 0.5s;
+    }
 
-
+    li:hover {
+        background: linear-gradient(to right, rgba(186, 186, 186, 1), rgba(255,0,0,0));
     }
 </style>
 <script src="script.js"></script>
