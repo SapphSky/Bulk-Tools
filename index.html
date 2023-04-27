@@ -4,28 +4,17 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Phoenix Template Editor</title>
+    <title>Template Editor</title>
 </head>
 
 <body>
-    <div id="grid-layout">
-        <div>
-            <div id="container_groups">
+    <div>
+        <div id="container_groups">
 
-            </div>
-            <div>
-                <button id="new_group" title="New Group">New</button>
-                <button id="save" title="Save group as CSV template">Save</button>
-            </div>
         </div>
-
-        <div id="preview" hidden>
-            <div id="header">
-                <span>Preview</span>
-                <div>
-
-                </div>
-            </div>
+        <div>
+            <button id="new_group" title="New Group">New Group</button>
+            <button id="save" title="Save group as CSV template">Save as CSV</button>
         </div>
     </div>
 
@@ -47,39 +36,6 @@
         </div>
     </template>
 
-    <template id="deprecated_attribute">
-        <div>
-            <select>
-                <option value="" hidden>Select an attribute...</option>
-                <option value="manufacturer">Manufacturer</option>
-                <option value="warehouse_location">Location</option>
-                <option value="model">Model</option>
-                <option value="ram">RAM</option>
-                <option value="cpu">CPU</option>
-                <option value="hard_drive">Hard Drive</option>
-                <option value="sku">SKU</option>
-                <option value="description">Description</option>
-                <option value="comments">Comments</option>
-                <option value="condition">Condition</option>
-                <option value="color">Color</option>
-                <option value="battery_count">Battery Cycle Count</option>
-                <option value="security_level">Security Level</option>
-                <option value="trackpad_is_working">Trackpad Working</option>
-                <option value="keyboard_is_working">Keyboard Working</option>
-                <option value="lcd_display_is_working">LCD Working</option>
-                <option value="battery_is_working">Battery Working</option>
-                <option value="device_type">Device Type</option>
-                <option value="year">Year</option>
-                <option value="gpu">GPU</option>
-                <option value="hard_drive_size_in_gb">HD Size in GB</option>
-                <option value="model_order">Model Order</option>
-                <option value="enrolled_status">Enrolled Status</option>
-            </select>
-            <span>→</span>
-            <input type="text" autocapitalize="off">
-        </div>
-    </template>
-
     <template id="attribute">
         <div>
             <span>Security Level</span>
@@ -96,6 +52,149 @@
         </div>
     </template>
 </body>
+
+<script>
+    //! Classes
+    class TemplateGroup {
+        constructor(name) {
+            this.name = name;
+            this.ids = [];
+            this.attributes = {};
+            this.displayElement = null;
+        }
+
+        addId(id) {
+            if (this.ids.find(element => element == id)) {
+                return false;
+            }
+            else {
+                this.ids.push(id.trim());
+                // console.log(`Added ID: ${id} to group ${this.name}`);
+                this.drawIds();
+                return true;
+            }
+        }
+
+        delId(id) {
+            this.ids.splice(this.ids.indexOf(id), 1);
+            this.drawIds();
+        }
+
+        setAttrib(key, value) {
+            this.attributes[key] = value;
+            // console.log(`Attribute set: ${key} set to ${value} for group ${this.name}`);
+        }
+
+        drawIds() {
+            if (this.displayElement != null) {
+                const id_container = this.displayElement.querySelector("div#container_ids");
+                id_container.innerHTML = "";
+
+                this.ids.forEach(element => {
+                    const newElement = document.createElement("li");
+                    newElement.innerText = element;
+                    newElement.title = "Click to remove ID from group";
+                    newElement.addEventListener("click", () => this.delId(element));
+                    id_container.appendChild(newElement);
+                });
+            }
+            else {
+                console.error(`Unable to draw ID list for group ${this.name}`);
+                return false;
+            }
+        }
+
+        drawAttributes() {
+            
+        }
+    }
+
+    //! Variables
+    var groups = [];
+
+    //! Containers
+    const container_groups = document.querySelector("div#container_groups");
+
+    //! Templates
+    const template_group = document.querySelector("template#group");
+    const template_attribute = document.querySelector("template#attribute");
+
+    //! Buttons
+    const button_new_group = document.querySelector("button#new_group");
+    button_new_group.addEventListener("click", () => createNewGroup());
+
+    const btn_save = document.querySelector("button#save");
+    btn_save.addEventListener("click", () => saveBtnEventHandler());
+
+    //! Functions
+    function createNewGroup() {
+        if (groups.length >= 6) {
+            button_new_group.disabled = true;
+            // console.log("Max groups exceeded!");
+            return;
+        }
+        const group = new TemplateGroup(groups.length);
+        groups.push(group);
+        
+        // Create display elements
+        const element = template_group.content.firstElementChild.cloneNode(true);
+        createNewAttribute(element.querySelector("div#container_attributes"), group.name);
+        
+        const input_id = element.querySelector("input#id_entry");
+        input_id.setAttribute("data-groupID", group.name);
+        input_id.addEventListener("change", (event) => idEntryHandler(event));
+    
+        group.displayElement = element;
+        container_groups.appendChild(element);
+    }
+
+    function createNewAttribute(parentNode, groupID) {
+        const attribute = template_attribute.content.firstElementChild.cloneNode(true);
+        attribute.setAttribute("data-last", true);
+        parentNode.appendChild(attribute);
+        
+        const select = attribute.querySelector("select");
+        
+        select.addEventListener("change", (event) => {
+            groups[groupID].setAttrib("security_level", event.target.value);
+            groups[groupID].drawIds();
+        });
+
+        groups[groupID].setAttrib("security_level", select.value);
+        return attribute;
+    }
+
+    //! Event Handlers
+    function saveBtnEventHandler() {
+        csvRows = [];
+        const headers = ["id"];
+        headers.push(Object.keys(groups[0].attributes));
+        csvRows.push(headers.toString(), "\n");
+
+        groups.forEach((group, index) => {
+            group.ids.forEach((element) => {
+                csvRows.push(`${element},"${Object.values(group.attributes).toString()}"`, "\n");
+            });
+        });
+
+        const blob = new Blob(csvRows, {type: "text/csv"});
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.setAttribute("href", url);
+        a.setAttribute("download", "download.csv");
+        a.click();
+    }
+
+    function idEntryHandler(event) {
+        const groupID = event.target.getAttribute("data-groupID");
+        const value = event.target.value;
+        if (value != "") {
+            event.target.value = "";
+        }
+    }
+
+    createNewGroup();
+</script>
 
 <style>
     :root {
@@ -124,44 +223,46 @@
     }
 
     body {
-        margin-top: 32px;
         font-family: Arial, Helvetica, sans-serif;
     }
 
-    div#grid-layout {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        grid-template-rows: 1fr 1fr;
+    header {
+
     }
 
     li {
-        display: inline;
+        display: inline-block;
+        margin: 2px;
+        padding: 2px 4px;
         list-style: none;
-        padding: 4px 8px;
-        border-radius: 4px 0px 0px 4px;
-        background: linear-gradient(to right, rgba(0, 0, 0, 0), rgba(0, 0, 0, 0));
+        background-color: deepskyblue;
+        border-color: cornflowerblue;
+        border-radius: 4px;
+        border-style: solid;
+        border-width: 2px;
         transition: ease 0.5s;
     }
 
     li:hover {
-        background: linear-gradient(to right, rgba(186, 186, 186, 1), rgba(255,0,0,0));
+        cursor: no-drop;
     }
 
     div.group {
-        margin: 4px auto;
+        margin: 4px;
         padding: 8px;
-
+        max-width: 400px;
+        max-height: 300px;
         background-color: rgba(226, 226, 226, 0.9);
-        border-radius: 4px;
-        transition: ease 0.2s;
         user-select: none;
+        border-radius: 4px;
+        outline-color: black;
+        outline-style: solid;
+        outline-width: 0px;
+        transition: ease 0.2s;
     }
 
     div.group:hover {
-        outline-color: black;
-        outline-style: solid;
         outline-width: 2px;
     }
 </style>
-<script src="script.js"></script>
 </html>
