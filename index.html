@@ -28,7 +28,7 @@
             
             <div>
                 <span>IDs</span>
-                <input type="text" id="id_entry" size="12" placeholder="Enter new ID...">
+                <input id="id_entry" type="text" size="12" placeholder="Enter new ID...">
                 <div id="container_ids">
                     
                 </div>
@@ -51,6 +51,32 @@
             </select>
         </div>
     </template>
+
+    <template id="functionality">
+        <label>
+            Trackpad
+            <input type="checkbox" name="trackpad_is_working" id="">
+        </label>
+
+        <label>
+            Keyboard
+            <input type="checkbox" name="keyboard_is_working" id="">
+        </label>
+
+        <label>
+            LCD
+            <input type="checkbox" name="lcd_display_is_working" id="">
+        </label>
+
+        <label>
+            Battery
+            <input type="checkbox" name="battery_is_working" id="">
+        </label>
+    </template>
+
+    <template>
+        
+    </template>
 </body>
 
 <script>
@@ -69,7 +95,7 @@
             }
             else {
                 this.ids.push(id.trim());
-                // console.log(`Added ID: ${id} to group ${this.name}`);
+                console.log(`Added ID: ${id} to group ${this.name}`);
                 this.drawIds();
                 return true;
             }
@@ -82,7 +108,7 @@
 
         setAttrib(key, value) {
             this.attributes[key] = value;
-            // console.log(`Attribute set: ${key} set to ${value} for group ${this.name}`);
+            console.log(`Attribute set: ${key} set to ${value} for group ${this.name}`);
         }
 
         drawIds() {
@@ -110,7 +136,7 @@
     }
 
     //! Variables
-    var groups = [];
+    groups = [];
 
     //! Containers
     const container_groups = document.querySelector("div#container_groups");
@@ -181,7 +207,7 @@
         const url = window.URL.createObjectURL(blob);
         const a = document.createElement("a");
         a.setAttribute("href", url);
-        a.setAttribute("download", "download.csv");
+        a.setAttribute("download", "template.csv");
         a.click();
     }
 
@@ -189,6 +215,7 @@
         const groupID = event.target.getAttribute("data-groupID");
         const value = event.target.value;
         if (value != "") {
+            groups[groupID].addId(value);
             event.target.value = "";
         }
     }
@@ -224,10 +251,6 @@
 
     body {
         font-family: Arial, Helvetica, sans-serif;
-    }
-
-    header {
-
     }
 
     li {
